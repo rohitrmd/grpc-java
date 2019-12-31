@@ -1,4 +1,4 @@
-package com.github.examples;
+package com.github.examples.grpc.server;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
