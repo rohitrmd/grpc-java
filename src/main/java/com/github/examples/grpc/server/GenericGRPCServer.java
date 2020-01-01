@@ -13,6 +13,7 @@ public class GenericGRPCServer {
             .addService(new GreetServiceImpl())
             .addService(new CalServiceImpl())
             .addService(new PrimeServiceImpl())
+            .addService(new AverageServiceImpl())
             .build();
 
         server.start();
