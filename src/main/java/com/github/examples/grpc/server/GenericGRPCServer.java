@@ -5,13 +5,14 @@ import io.grpc.ServerBuilder;
 
 import java.io.IOException;
 
-public class GreetingServer {
+public class GenericGRPCServer {
     public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("Starting gRPC server!");
 
         Server server = ServerBuilder.forPort(50001)
             .addService(new GreetServiceImpl())
             .addService(new CalServiceImpl())
+            .addService(new PrimeServiceImpl())
             .build();
 
         server.start();
