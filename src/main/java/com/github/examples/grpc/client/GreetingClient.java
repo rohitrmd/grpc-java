@@ -1,6 +1,7 @@
 package com.github.examples.grpc.client;
 
 import com.proto.dummy.DummyServiceGrpc;
+import com.proto.greet.GreetManyTimesRequest;
 import com.proto.greet.GreetRequest;
 import com.proto.greet.GreetResponse;
 import com.proto.greet.GreetServiceGrpc;
@@ -23,13 +24,24 @@ public class GreetingClient {
             .setLastName("Deshpande")
             .build();
 
-        GreetRequest request = GreetRequest.newBuilder()
+        // Case 1: Unary request/response
+//        GreetRequest request = GreetRequest.newBuilder()
+//            .setGreeting(greeting)
+//            .build();
+//
+//        GreetResponse response = greetClient.greet(request);
+//
+//        System.out.println("Response: " + response.getResult());
+
+        // Case 2: Server streaming request/response
+        GreetManyTimesRequest request = GreetManyTimesRequest.newBuilder()
             .setGreeting(greeting)
             .build();
 
-        GreetResponse response = greetClient.greet(request);
-
-        System.out.println("Response: " + response.getResult());
+        greetClient.greetManyTimes(request)
+            .forEachRemaining(greetManyTimesResponse -> {
+                System.out.println(greetManyTimesResponse.getResult());
+            });
 
         System.out.println("Shutting down channel");
         channel.shutdown();
