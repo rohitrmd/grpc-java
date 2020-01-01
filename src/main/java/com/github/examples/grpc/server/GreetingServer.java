@@ -11,6 +11,7 @@ public class GreetingServer {
 
         Server server = ServerBuilder.forPort(50001)
             .addService(new GreetServiceImpl())
+            .addService(new CalServiceImpl())
             .build();
 
         server.start();
