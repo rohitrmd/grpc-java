@@ -1,6 +1,8 @@
 package com.github.examples.grpc.client;
 
 import com.proto.dummy.DummyServiceGrpc;
+import com.proto.greet.GreetEveryoneRequest;
+import com.proto.greet.GreetEveryoneResponse;
 import com.proto.greet.GreetManyTimesRequest;
 import com.proto.greet.GreetRequest;
 import com.proto.greet.GreetResponse;
@@ -12,6 +14,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -28,8 +31,11 @@ public class GreetingClient {
 //        // Case 2: Server streaming request/response
 //        client.makeServerStreamingCall();
 
-        // Case 3: Client streaming call
-        client.makeClientStreamingCall();
+//        // Case 3: Client streaming call
+//        client.makeClientStreamingCall();
+
+        // Case 4: Bidirectional Streaming call
+        client.makeBidirectionalStreamingCall();
 
     }
 
@@ -101,8 +107,6 @@ public class GreetingClient {
             }
         });
 
-
-
         requestObserver.onNext(LongGreetRequest.newBuilder()
             .setGreeting(greeting)
             .build());
@@ -119,7 +123,45 @@ public class GreetingClient {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        channel.shutdown();
+    }
 
+    private void makeBidirectionalStreamingCall() {
+        ManagedChannel channel = getManagedChannel();
+        GreetServiceGrpc.GreetServiceStub asyncClient = GreetServiceGrpc.newStub(channel);
 
+        CountDownLatch latch = new CountDownLatch(1);
+
+        StreamObserver<GreetEveryoneRequest> requestObserver = asyncClient.greetEveryone(new StreamObserver<GreetEveryoneResponse>() {
+            @Override
+            public void onNext(GreetEveryoneResponse value) {
+                System.out.println("Got response from server = " + value.getResult());
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                latch.countDown();
+            }
+
+            @Override
+            public void onCompleted() {
+                System.out.println("Got completed response from server");
+                latch.countDown();
+            }
+        });
+
+        Arrays.asList("Rohit", "Rucha").forEach(name ->
+        {
+            requestObserver.onNext(GreetEveryoneRequest.newBuilder()
+                .setGreeting(Greeting.newBuilder().setFirstName(name).build())
+                .build());
+        });
+        requestObserver.onCompleted();
+        try {
+            latch.await(3L, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        channel.shutdown();
     }
 }
