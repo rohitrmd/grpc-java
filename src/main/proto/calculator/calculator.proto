@@ -18,6 +18,17 @@ message CalResponse {
     int32 result = 1;
 }
 
+message CalMaxRequest {
+    int32 input = 1;
+}
+
+message CalMaxResponse {
+    int32 output = 1;
+}
+
 service CalService {
     rpc calculate(CalRequest) returns (CalResponse) {};
+
+    // bidirectional calculating maximum api call
+    rpc maximum(stream CalMaxRequest) returns (stream CalMaxResponse) {};
 }

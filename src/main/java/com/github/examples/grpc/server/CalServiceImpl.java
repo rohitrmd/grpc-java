@@ -1,5 +1,7 @@
 package com.github.examples.grpc.server;
 
+import com.proto.calculator.CalMaxRequest;
+import com.proto.calculator.CalMaxResponse;
 import com.proto.calculator.CalRequest;
 import com.proto.calculator.CalResponse;
 import com.proto.calculator.CalServiceGrpc;
@@ -18,5 +20,29 @@ public class CalServiceImpl extends CalServiceGrpc.CalServiceImplBase {
         // Set response
         responseObserver.onNext(response);
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public StreamObserver<CalMaxRequest> maximum(StreamObserver<CalMaxResponse> responseObserver) {
+        StreamObserver<CalMaxRequest> request =  new StreamObserver<CalMaxRequest>() {
+            int max = Integer.MIN_VALUE;
+
+            @Override
+            public void onNext(CalMaxRequest value) {
+                max = Math.max(value.getInput(), max);
+                responseObserver.onNext(CalMaxResponse.newBuilder().setOutput(max).build());
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+
+            @Override
+            public void onCompleted() {
+                responseObserver.onCompleted();
+            }
+        };
+        return request;
     }
 }

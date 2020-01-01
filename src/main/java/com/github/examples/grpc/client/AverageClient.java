@@ -39,7 +39,7 @@ public class AverageClient {
             }
         });
 
-        responseStreamObserver.onNext(AverageRequest.newBuilder().setInput(4).build());
+        responseStreamObserver.onNext(AverageRequest.newBuilder().setInput(400).build());
         responseStreamObserver.onNext(AverageRequest.newBuilder().setInput(5).build());
         responseStreamObserver.onNext(AverageRequest.newBuilder().setInput(6).build());
         responseStreamObserver.onCompleted();
