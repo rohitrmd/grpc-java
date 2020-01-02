@@ -1,6 +1,5 @@
 package com.github.examples.grpc.client;
 
-import com.proto.dummy.DummyServiceGrpc;
 import com.proto.greet.GreetEveryoneRequest;
 import com.proto.greet.GreetEveryoneResponse;
 import com.proto.greet.GreetManyTimesRequest;
@@ -10,6 +9,7 @@ import com.proto.greet.GreetServiceGrpc;
 import com.proto.greet.Greeting;
 import com.proto.greet.LongGreetRequest;
 import com.proto.greet.LongGreetResponse;
+import io.grpc.Deadline;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
@@ -17,7 +17,6 @@ import io.grpc.stub.StreamObserver;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 public class GreetingClient {
     public static void main(String[] args) {
@@ -34,8 +33,11 @@ public class GreetingClient {
 //        // Case 3: Client streaming call
 //        client.makeClientStreamingCall();
 
-        // Case 4: Bidirectional Streaming call
-        client.makeBidirectionalStreamingCall();
+//        // Case 4: Bidirectional Streaming call
+//        client.makeBidirectionalStreamingCall();
+
+        // Case 5: Unary call with deadline
+        client.makeUnaryCallWithDeadline();
 
     }
 
@@ -162,6 +164,23 @@ public class GreetingClient {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        channel.shutdown();
+    }
+
+    private void makeUnaryCallWithDeadline() {
+        GreetRequest request = GreetRequest.newBuilder()
+            .setGreeting(greeting)
+            .build();
+
+        ManagedChannel channel = getManagedChannel();
+        GreetServiceGrpc.GreetServiceBlockingStub greetClient = GreetServiceGrpc.newBlockingStub(channel);
+
+        GreetResponse response = greetClient.withDeadline(Deadline.after(100L, TimeUnit.MILLISECONDS))
+            .greet(request);
+
+        System.out.println("Response: " + response.getResult());
+
+        System.out.println("Shutting down channel");
         channel.shutdown();
     }
 }

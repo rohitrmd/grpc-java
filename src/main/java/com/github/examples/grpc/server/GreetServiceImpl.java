@@ -1,15 +1,19 @@
 package com.github.examples.grpc.server;
 
+import com.proto.greet.GreetDeadlineRequest;
+import com.proto.greet.GreetDeadlineResponse;
 import com.proto.greet.GreetEveryoneRequest;
 import com.proto.greet.GreetEveryoneResponse;
 import com.proto.greet.GreetManyTimesRequest;
 import com.proto.greet.GreetManyTimesResponse;
 import com.proto.greet.GreetRequest;
 import com.proto.greet.GreetResponse;
+import com.proto.greet.GreetResponseOrBuilder;
 import com.proto.greet.GreetServiceGrpc;
 import com.proto.greet.Greeting;
 import com.proto.greet.LongGreetRequest;
 import com.proto.greet.LongGreetResponse;
+import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
 
 public class GreetServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
@@ -98,5 +102,27 @@ public class GreetServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
         };
 
         return requestStreamObserver;
+    }
+
+    @Override
+    public void greetWithDeadline(GreetDeadlineRequest request, StreamObserver<GreetDeadlineResponse> responseObserver) {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Context context = Context.current();
+        if(context.isCancelled()) {
+            System.out.println("Request is cancelled");
+            return;
+        }
+
+        responseObserver.onNext(
+                GreetDeadlineResponse.newBuilder()
+                    .setResult("Hello "+ request.getGreeting().getFirstName())
+                    .build()
+            );
+        responseObserver.onCompleted();
     }
 }
