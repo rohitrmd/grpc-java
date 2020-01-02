@@ -6,8 +6,10 @@ import com.proto.calculator.CalMaxResponse;
 import com.proto.calculator.CalRequest;
 import com.proto.calculator.CalResponse;
 import com.proto.calculator.CalServiceGrpc;
+import com.proto.calculator.SqRootRequest;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 
 import java.util.Arrays;
@@ -69,6 +71,14 @@ public class CalClient {
         try {
             latch.await(3L, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // case 3: Calculating sq root of a number with error handling
+        try {
+            calStub.sqRoot(SqRootRequest.newBuilder().setNumber(-100).build());
+        } catch (StatusRuntimeException e) {
+            System.out.println("Error while calculating sq root.");
             e.printStackTrace();
         }
 

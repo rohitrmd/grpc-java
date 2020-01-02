@@ -5,6 +5,9 @@ import com.proto.calculator.CalMaxResponse;
 import com.proto.calculator.CalRequest;
 import com.proto.calculator.CalResponse;
 import com.proto.calculator.CalServiceGrpc;
+import com.proto.calculator.SqRootRequest;
+import com.proto.calculator.SqRootResponse;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
 public class CalServiceImpl extends CalServiceGrpc.CalServiceImplBase {
@@ -44,5 +47,21 @@ public class CalServiceImpl extends CalServiceGrpc.CalServiceImplBase {
             }
         };
         return request;
+    }
+
+    @Override
+    public void sqRoot(SqRootRequest request, StreamObserver<SqRootResponse> responseObserver) {
+        if(request.getNumber()<0) {
+            responseObserver.onError(
+                Status.INVALID_ARGUMENT
+                .withDescription("Number provided is negative.")
+                .asException()
+            );
+        } else {
+            responseObserver.onNext(
+                SqRootResponse.newBuilder().setResult(Math.sqrt(request.getNumber())).build()
+            );
+            responseObserver.onCompleted();
+        }
     }
 }

@@ -26,9 +26,21 @@ message CalMaxResponse {
     int32 output = 1;
 }
 
+message SqRootRequest {
+    int32 number = 1;
+}
+
+message SqRootResponse {
+    double result = 1;
+}
+
 service CalService {
     rpc calculate(CalRequest) returns (CalResponse) {};
 
     // bidirectional calculating maximum api call
     rpc maximum(stream CalMaxRequest) returns (stream CalMaxResponse) {};
+
+    // sq root api call with error handling
+    // returns INVALID_ARGUMENT runtime exception
+    rpc sqRoot(SqRootRequest) returns (SqRootResponse) {};
 }
