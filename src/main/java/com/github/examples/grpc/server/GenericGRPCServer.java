@@ -3,6 +3,7 @@ package com.github.examples.grpc.server;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 
+import java.io.File;
 import java.io.IOException;
 
 public class GenericGRPCServer {
@@ -14,6 +15,10 @@ public class GenericGRPCServer {
             .addService(new CalServiceImpl())
             .addService(new PrimeServiceImpl())
             .addService(new AverageServiceImpl())
+//            .useTransportSecurity(          // Enable this for ssl encryption
+//                new File("ssl/server.crt"),
+//                new File("ssl/server.pem")
+//            )
             .build();
 
         server.start();

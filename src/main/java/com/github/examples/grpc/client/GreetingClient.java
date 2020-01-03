@@ -12,8 +12,12 @@ import com.proto.greet.LongGreetResponse;
 import io.grpc.Deadline;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts;
+import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import io.grpc.stub.StreamObserver;
 
+import javax.net.ssl.SSLException;
+import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -23,8 +27,8 @@ public class GreetingClient {
         System.out.println("Starting gRPC client");
 
         GreetingClient client = new GreetingClient();
-//        // Case 1: Unary request/response
-//        client.makeUnaryCall();
+        // Case 1: Unary request/response
+        client.makeUnaryCall();
 //
 //
 //        // Case 2: Server streaming request/response
@@ -36,8 +40,8 @@ public class GreetingClient {
 //        // Case 4: Bidirectional Streaming call
 //        client.makeBidirectionalStreamingCall();
 
-        // Case 5: Unary call with deadline
-        client.makeUnaryCallWithDeadline();
+//        // Case 5: Unary call with deadline
+//        client.makeUnaryCallWithDeadline();
 
     }
 
@@ -47,6 +51,17 @@ public class GreetingClient {
             .build();
 
         ManagedChannel channel = getManagedChannel();
+
+        // Enable this for ssl encryption
+//        ManagedChannel channel = null;
+//        try {
+//            channel = NettyChannelBuilder.forAddress("localhost", 50001)
+//                .sslContext(GrpcSslContexts.forClient().trustManager(new File("ssl/ca.crt")).build())
+//                .build();
+//        } catch (SSLException e) {
+//            e.printStackTrace();
+//        }
+
         GreetServiceGrpc.GreetServiceBlockingStub greetClient = GreetServiceGrpc.newBlockingStub(channel);
 
         GreetResponse response = greetClient.greet(request);
